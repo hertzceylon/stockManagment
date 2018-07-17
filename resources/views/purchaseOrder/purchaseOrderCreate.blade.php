@@ -22,7 +22,7 @@
         </div>
 
         <div class="panel-body">
-          <div class="alert alert-danger" style="display:none"></div>
+          <div class="alert alert-success" style="display:none"></div>
           <form  id='purchase_order_form' method="post" class="form-horizontal">
             {{ csrf_field() }}
             <input type="hidden" name="_method" value="post">
@@ -360,8 +360,8 @@ function savePurchaseOrder(update_id)
     {
       if(data.status != undefined)
       {
-          $('.alert-danger').show();
-          $('.alert-danger').append('<p>'+data.status+'</p>');
+          $('.alert-success').show();
+          $('.alert-success').append('<p>'+data.status+'</p>');
           resetNewPage();
       }
     }
@@ -372,7 +372,7 @@ function resetNewPage()
 {
   update_id = null;
 
-  $('order_date').val('');
+  $('#order_date').val('');
   $("#supplier_id").val('');
   $("#supplier_id").selectpicker("refresh");
   $('#order_id').val('');

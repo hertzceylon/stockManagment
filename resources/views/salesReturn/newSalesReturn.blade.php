@@ -19,7 +19,7 @@
         </div>
 
         <div class="panel-body">
-          <div class="alert alert-danger" style="display:none"></div>
+          <div class="alert alert-success" style="display:none"></div>
           <form  id='sales_return_form' method="post" class="form-horizontal">
             {{ csrf_field() }}
             <input type="hidden" name="_method" value="post">
@@ -422,8 +422,8 @@ function saveSalesReturn(update_id)
 
       if(data.status != undefined)
       {
-        $('.alert-danger').show();
-        $('.alert-danger').append('<p>'+data.status+'</p>');
+        $('.alert-success').show();
+        $('.alert-success').append('<p>'+data.status+'</p>');
           resetNewPage();
       }
     }

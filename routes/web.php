@@ -53,6 +53,8 @@ Route::resource('stock','stockController');
 //sales invoice 
 Route::resource('sales_invoice','saleInvoiceController');
 Route::get('print_sales_invoice/{print_id}','saleInvoiceController@print_sales_invoice');
+Route::get('/invoice_code', 'saleInvoiceController@invoice_code');
+
 
 //purchase return 
 Route::resource('purchase_return','purchaseReturnController');

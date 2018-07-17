@@ -14,8 +14,9 @@
             </div>
             <div class="col-sm-7" align="right">
               @if(isset($data['salesInvoice']))
-                <a href="/print_sales_invoice/{{$data['salesInvoice']->id}}" target="_blank" class="btn btn-default"><i class="fa fa-print" aria-hidden="true"></i> Print</a>
+                <a href="/print_sales_invoice/{{$data['salesInvoice']->id}}" target="_blank" class="btn btn-default"><i class="fa fa-print" aria-hidden="true" onload="window.print();"></i> Print</a>
               @endif
+                <a class="btn btn-default" style="display: none;" id="print_btn"><i class="fa fa-print" aria-hidden="true"></i> Print </a>
                 <a href="/sales_invoice/create" class="btn btn-info" target="_blank"><i class="fa fa-plus" aria-hidden="true"></i> New Sale Invoice</a>
                 <a href="/sales_invoice" class="btn btn-info"><i class="fa fa-eye" aria-hidden="true"></i> Lookup</a>
             </div>
@@ -23,7 +24,7 @@
         </div>
 
         <div class="panel-body">
-          <div class="alert alert-danger" style="display:none"></div>
+          <div class="alert alert-success" role="alert" style="display:none"></div>
           <form  id='sales_invoice_form' method="post" class="form-horizontal" onsubmit="return false;">
             {{ csrf_field() }}
             <input type="hidden" name="_method" value="post">
@@ -235,7 +236,7 @@
               <div class="col-sm-6" align="right">
                 @if(isset($data['salesInvoice']))
                 @else
-                  <button type="button" onclick="formValidate();" class="btn btn-info" onload="window.print();">Print</button>
+                  <button type="button" onclick="formValidate();" class="btn btn-info">Create</button>
                 @endif
                 <a href="/sales_invoice/create" class="btn btn-default ">Refresh</a>
               </div>
@@ -253,6 +254,7 @@
 
 var invoice_item = {};
 var update_id    = 0;
+var print_id     = 0;
 
 $(document).ready(function()
 {
@@ -324,26 +326,17 @@ $('#payment_amount').on('keyup',function ()
 
 $('#invoice_item_table_body').on('keyup', '.invoice_qty', function()
 {
+  var invoice_qty   = parseFloat($(this).val());
+  var tr_id         = $(this).closest("tr").attr("id");
+  var avb_qty_class = $('#'+tr_id).find('.avb_qty_class').html();
 
-  var invoice_qty     = parseFloat($(this).val());
-
-  var td = $(this).find('.avb_aty_class').val();
-// item["order_type"]  = ;
-  // var avb_aty_class = parseFloat(($(this).find('.avb_aty_class').text() == "" ? 0 : $(this).find('.avb_aty_class').text()));
-  // var avb_aty_class      = parseFloat(($(this).find('.avb_aty_class').text() == "" ? 0 : $(this).find('.avb_aty_class').text()));
-
-  // $('table_error').val('');
-  // $('#error').hide();
-
-  console.log(td);
-
-  // console.log(($(this).find('.avb_aty_class').text());
-
-  // if(invoice_qty > avb_aty_class)
-  // {
-  //   $('#error').show();
-  //   $("#table_error").text("Invoice QTY can not be grater than the Available QTY.");
-  // }
+  $('#table_error').val('');
+  $('#error').hide();
+  if(invoice_qty > avb_qty_class)
+  {
+    $('#error').show();
+    $("#table_error").text("Invoice QTY can not be grater than the Available QTY.");
+  }
 
   calculationTable();
   createTableObject();
@@ -371,13 +364,16 @@ function calculation()
   var item_price           = $('#item_price').text();
   var invoice_amount       = $('#invoice_amount').val();
   var discount             = $('#discount').val();
-  var total_invoice_amount = $('#total_invoice_amount').val();
   var payment_amount       = $('#payment_amount').val();
 
   $('#total_amount').text(invoice_qty * item_price);
   $('#discount_amount').val((invoice_amount * discount) /100);
-  $('#total_invoice_amount').val(invoice_amount -(invoice_amount * discount) /100);
-  $('#balance_amount').val(payment_amount - total_invoice_amount);
+  $('#total_invoice_amount').val((invoice_amount -(invoice_amount * discount) /100).toFixed(2));
+
+  var total_invoice_amount = $('#total_invoice_amount').val();
+  var balance_amount       = payment_amount - parseFloat(total_invoice_amount);
+
+  $('#balance_amount').val(balance_amount.toFixed(2));
 }
 
 function addInvoiceItem()
@@ -394,7 +390,7 @@ function addInvoiceItem()
   var g_total_amount  = 0;
   var item_already    = null;
 
-  $('table_error').val('');
+  $('#table_error').val('');
   $('#error').hide();
 
   $(invoice_item).each(function(i, el)
@@ -411,7 +407,7 @@ function addInvoiceItem()
     {
       if(invoice_qty < avb_qty || invoice_qty == avb_qty)
       {
-        invoiceContent = '<tr id="'+item_id+'" ><td hidden>'+item_id+'</td><td class="text-center" style="border: 1px solid #dddddd;">'+item_name+'</td><td class="text-center item_price_class" id="item_price" style="border: 1px solid #dddddd;">'+item_price+'</td><td class="text-center avb_aty_class" id="avb_qty" style="border: 1px solid #dddddd;">'+avb_qty+'</td><td hidden>'+issue_type+'</td><td class="text-center" style="border: 1px solid #dddddd;">'+issue_type_name+'</td><td class="text-center invoice_qty_class" id="invoice_qty" style="border: 1px solid #dddddd;"><input type="text" class="form-control invoice_qty" onkeypress="return numberOnly(event)" value="'+invoice_qty+'"></td><td class="text-right total_amount_class" id="total_amount" style="border: 1px solid #dddddd;">'+Number(total_amount,2)+'</td><td class="text-center" style="border: 1px solid #dddddd;"><a onclick="removeInvoiceItem('+item_id+')" class="btn btn-danger btn-xs" type="button">Remove</a></td></tr>';
+        invoiceContent = '<tr id="'+item_id+'" ><td hidden>'+item_id+'</td><td class="text-center" style="border: 1px solid #dddddd;">'+item_name+'</td><td class="text-center item_price_class" id="item_price" style="border: 1px solid #dddddd;">'+item_price+'</td><td class="text-center avb_qty_class" id="avb_qty" style="border: 1px solid #dddddd;">'+avb_qty+'</td><td hidden>'+issue_type+'</td><td class="text-center" style="border: 1px solid #dddddd;">'+issue_type_name+'</td><td class="text-center invoice_qty_class" id="invoice_qty" style="border: 1px solid #dddddd;"><input type="text" class="form-control invoice_qty" onkeypress="return numberOnly(event)" value="'+invoice_qty+'"></td><td class="text-right total_amount_class" id="total_amount" style="border: 1px solid #dddddd;">'+Number(total_amount,2)+'</td><td class="text-center" style="border: 1px solid #dddddd;"><a onclick="removeInvoiceItem('+item_id+')" class="btn btn-danger btn-xs" type="button">Remove</a></td></tr>';
 
         $("#invoice_item_table tbody").append(invoiceContent);
         reset();
@@ -523,18 +519,53 @@ function saveSalesInvoice(update_id)
     {
       if(data.status != undefined)
       {
-        $('.alert-danger').show();
-        $('.alert-danger').append('<p>'+data.status+'</p>');
-        update_id =data.id;
-        print(update_id);
+        $('.alert-success').show();
+        $('.alert-success').append('<p>'+data.status+'</p>');
+
+        update_id = data.id;
+        print_id = data.id;
+        resetNewPage();
+        $('#print_btn').show();
       }
     }
   });
 }
 
-function print(update_id)
+function resetNewPage()
 {
-  window.location.replace("/print_sales_invoice/"+update_id).print();
+  $('#invoice_date').val('');
+
+  $("#invoice_id").val('');
+  $('#invoice_amount').val('');
+  $('#discount').val('');
+  $('#payment_amount').val('');
+  $('#remarks').val('');
+  invoice_item = [];
+  $('#invoice_item_table > tbody  > tr:not(#invoice_item_table)').empty();
+  invoiceCode();
+}
+
+function invoiceCode()
+{
+  $.ajax({
+    url: '/invoice_code',
+    type: "GET",
+    dataType: 'JSON',
+    success: function(invoice_code) 
+    {
+      $("#invoice_id").val(invoice_code);
+    }
+  });
+}
+
+$('#print_btn').on('click',function ()
+{
+  print(print_id);
+});
+
+function print(print_id)
+{
+  window.open("/print_sales_invoice/"+print_id).print();
 }
 
 </script>

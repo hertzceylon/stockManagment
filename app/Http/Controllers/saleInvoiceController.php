@@ -23,6 +23,24 @@ class saleInvoiceController extends Controller
         return view("salesInvoice.SalesInvoices")->with('data',$data);
     }
 
+    public function invoice_code()
+    {
+      $lastSInvoice = salesInvoice::orderBy('created_at', 'desc')->first();
+
+      if(! $lastSInvoice)
+      {
+        $number = 0;
+      }
+      else
+      {
+        $number = substr($lastSInvoice->invoice_id, 3);
+      }
+
+      $invoice_code = 'SI' . sprintf('%06d', intval($number) + 1);
+
+      return $invoice_code;
+    }
+
     /**
      * Show the form for creating a new resource.
      *
@@ -32,7 +50,7 @@ class saleInvoiceController extends Controller
     {
         $data          = array();
 
-        $data['items']= DB::table('items')
+        $items= DB::table('items')
         ->select(
             'items.id as id', 
             'items.item_name as item_name',
@@ -50,6 +68,61 @@ class saleInvoiceController extends Controller
         ->groupBy('items.id')
         ->groupBy('stocks.item_price')
         ->get();
+
+        $total_stock_qty = 0;
+
+        foreach ($items as $key => $item) 
+        {
+          $salesInvoice = DB::table('sale_invoice_entries')
+          ->select(
+            DB::raw('SUM(sale_invoice_entries.invoice_qty) as invoice_qty')
+          )
+          ->where('sale_invoice_entries.item_id',$item->id)
+          ->where('sale_invoice_entries.price',$item->item_price)
+          ->first();
+
+          $salesReturn = DB::table('sales_return_entries')
+          ->select(
+            DB::raw('SUM(sales_return_entries.return_qty) as return_qty')
+          )
+          ->where('sales_return_entries.item_id',$item->id)
+          ->where('sales_return_entries.item_price',$item->item_price)
+          ->first();
+
+          $purchaseReturn = DB::table('purchase_return_entries')
+          ->select(
+            DB::raw('SUM(purchase_return_entries.return_qty) as return_qty')
+          )
+          ->where('purchase_return_entries.item_id',$item->id)
+          ->where('purchase_return_entries.item_price',$item->item_price)
+          ->first();
+
+          if($salesInvoice != null)
+          {
+            $total_stock_qty = $item->stock_qty - $salesInvoice->invoice_qty;
+          }
+
+          if($salesReturn !=null)
+          {
+            $total_stock_qty = $total_stock_qty + $salesReturn->return_qty;
+          }
+
+          if($purchaseReturn !=null)
+          {
+            $total_stock_qty = $total_stock_qty - $purchaseReturn->return_qty;
+          }
+
+          if($total_stock_qty > 0)
+          {
+            $item->stock_qty = $total_stock_qty;
+          }
+          else
+          {
+            $item->stock_qty = 0;
+          }
+        }
+
+        $data['items'] = $items;
 
         $lastSInvoice = salesInvoice::orderBy('created_at', 'desc')->first();
 
@@ -238,16 +311,62 @@ class saleInvoiceController extends Controller
 
         foreach ($saleInvoiceEntries as $key => $saleInvoiceEntry)
         {
-
           $stock = DB::table('stocks')
           ->select(
             DB::raw('SUM(stocks.stock_qty) as stock_qty')
           )
           ->where('stocks.item_id','=',$saleInvoiceEntry->item_id)
           ->where('stocks.item_price','=',$saleInvoiceEntry->price)
+          ->where('stocks.transaction_name','=','GRN')
           ->first();
 
-            $saleInvoiceEntry->avb_qty         =$stock->stock_qty- $saleInvoiceEntry->invoice_qty;
+          $salesInvoice_e = DB::table('sale_invoice_entries')
+          ->select(
+            DB::raw('SUM(sale_invoice_entries.invoice_qty) as invoice_qty')
+          )
+          ->where('sale_invoice_entries.item_id',$saleInvoiceEntry->item_id)
+          ->where('sale_invoice_entries.price',$saleInvoiceEntry->price)
+          ->first();
+
+          $salesReturn = DB::table('sales_return_entries')
+          ->select(
+            DB::raw('SUM(sales_return_entries.return_qty) as return_qty')
+          )
+          ->where('sales_return_entries.item_id',$saleInvoiceEntry->item_id)
+          ->where('sales_return_entries.item_price',$saleInvoiceEntry->price)
+          ->first();
+
+          $purchaseReturn = DB::table('purchase_return_entries')
+          ->select(
+            DB::raw('SUM(purchase_return_entries.return_qty) as return_qty')
+          )
+          ->where('purchase_return_entries.item_id',$saleInvoiceEntry->item_id)
+          ->where('purchase_return_entries.item_price',$saleInvoiceEntry->price)
+          ->first();
+
+          if($salesInvoice_e != null)
+          {
+            $total_stock_qty = $stock->stock_qty - $salesInvoice_e->invoice_qty;
+          }
+
+          if($salesReturn !=null)
+          {
+            $total_stock_qty = $total_stock_qty + $salesReturn->return_qty;
+          }
+
+          if($purchaseReturn !=null)
+          {
+            $total_stock_qty = $total_stock_qty - $purchaseReturn->return_qty;
+          }
+
+          if($total_stock_qty > 0)
+          {
+            $saleInvoiceEntry->avb_qty = $total_stock_qty;
+          }
+          else
+          {
+            $saleInvoiceEntry->avb_qty = 0;
+          }
         }
 
         $data['salesInvoice']       = $salesInvoice;
@@ -357,6 +476,5 @@ class saleInvoiceController extends Controller
         $data['salesInvoice']       = $salesInvoice;
         $data['saleInvoiceEntries'] = $saleInvoiceEntries;
         return view('printouts.salesInvoicePrint')->with('data',$data);
-
     }
 }

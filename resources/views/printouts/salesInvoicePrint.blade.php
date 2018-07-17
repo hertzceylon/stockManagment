@@ -1,20 +1,21 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <title>Sales Invoice</title>
-  <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.5.0/css/font-awesome.min.css" integrity="sha384-XdYbMnZ/QjLh6iI4ogqCTaIjrFk87ip+ekIjefZch0Y+PvJ8CDYtEs1ipDmPorQ+" crossorigin="anonymous">
+  <head>
+    <title>Sales Invoice</title>
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.5.0/css/font-awesome.min.css" integrity="sha384-XdYbMnZ/QjLh6iI4ogqCTaIjrFk87ip+ekIjefZch0Y+PvJ8CDYtEs1ipDmPorQ+" crossorigin="anonymous">
 
-    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous"> {{-- <link href="{{ elixir('css/app.css') }}" rel="stylesheet"> --}}
-    <!-- Google Font -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:100,300,400,700">
+      <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous"> {{-- <link href="{{ elixir('css/app.css') }}" rel="stylesheet"> --}}
+      <!-- Google Font -->
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:100,300,400,700">
 
-</head>
-<body onload="window.print();">
+  </head>
+  <body onload="window.print();">
     <div class='text-center' style='width:375px; border: 1px solid #000; padding: 4px;'>
       <div class="row text-right" style='width:375px;'> print time: {{date("Y-m-d H:i:sa")}}</div> 
       <div class="row"><h3>Manuri Pharmacy</h3></div>
       <div class="row"><h4>Sales Invoice</h4></div>
+      <div class="row" style="font-size: 12px;">Tel : 000 0 000 000 / 000 0 000 000</div>
     </div>
 
     <div class='text-center' style='width:375px; border: 1px solid #000; padding: 4px;'>
@@ -54,7 +55,7 @@
       </div>
     </div>
 
-    <div class='text-center' style='width:375px; height: 400px; border: 1px solid #000; padding: 4px;'>
+    <div class='text-center' style='width:375px; border: 1px solid #000; padding: 4px;'>
       <table class="table table-striped table-hover table-center" cellspacing="0">
         <thead>
           <tr>
@@ -88,6 +89,11 @@
           </tr>
         </tfoot>
       </table>
+
+      <div class='text-center' style='width:375px;' > Thank You Come Again..... ! </div>
+      <br>
+      <div class='text-center' style='width:375px; font-size: 12px;'>- System By Hertz Ceylon (PVT) Ltd , Tel : 011 4 346 774 -</div>
     </div>
-</body>
+
+  </body>
 </html>

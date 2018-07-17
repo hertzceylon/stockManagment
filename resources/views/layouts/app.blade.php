@@ -15,7 +15,6 @@
         <link href="{{ asset('css/libries/bootstrap-select.min.css') }}" rel="stylesheet">
         <link href="{{ asset('css/libries/datatables.min.css') }}" rel="stylesheet">
         <link href="{{ asset('css/libries/select2.min.css') }}" rel="stylesheet">
-
         <link href="{{ asset('css/libries/cell-corner-button.css') }}" rel="stylesheet">
         <link href="{{ asset('css/libries/fullcalendar.min.css') }}" rel="stylesheet">
         <link href="{{ asset('css/libries/formValidation.min.css') }}" rel="stylesheet">
@@ -28,6 +27,7 @@
         <script src="{{ asset('js/libries/select2.min.js') }}"></script>
     </head>
     <body>
+
         <div id="throbber" style="display:none; min-height:120px;"></div>
         <div id="noty-holder"></div>
         <div id="wrapper">
@@ -122,7 +122,6 @@
 <script type="text/javascript">
 $(document).ready(function()
 {
-
     $('.datepicker').datepicker({
       format:'yyyy-mm-dd',
       todatbtn:'linked',

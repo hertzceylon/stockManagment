@@ -254,9 +254,21 @@ class purchaseOrderController extends Controller
     {
         $data = array();
 
-        $data['purchaseOrder']     = purchaseOrder::findOrFail($print_id);
+        // $data['purchaseOrder']     = purchaseOrder::findOrFail($print_id);
+        $data['purchaseOrder']     = DB::table('purchase_orders')
+        ->select(
+            'purchase_orders.id as id',
+            'purchase_orders.order_date as order_date',
+            'purchase_orders.supplier_id as supplier_id',
+            'purchase_orders.order_id as order_id',
+            'purchase_orders.remarks as remarks',
+            'suppliers.supplier_name as supplier_name'
+        )
+        ->join('suppliers','suppliers.id','=','purchase_orders.supplier_id')
+        ->where('purchase_orders.id',$print_id)
+        ->first();
 
-        $data['prchaseOrderEntry'] = DB::table('prchase_order_entries')
+        $data['prchase_order_entries'] = DB::table('prchase_order_entries')
         ->select(
             'prchase_order_entries.order_type as order_type',
             'prchase_order_entries.order_qty as order_qty',
@@ -270,6 +282,6 @@ class purchaseOrderController extends Controller
         ->where('prchase_order_entries.purchase_order_id','=',$print_id)
         ->get();
 
-        dd($data);
+        return view('printouts.purchaseOrderPrint')->with('data',$data);
     }
 }
