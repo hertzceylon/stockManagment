@@ -15,7 +15,42 @@ class salesInvoiceReport extends Controller
      */
     public function index()
     {
-        return view("report.salesInvoiceReport");
+        $data      = array();
+
+        $from_date =  date('Y-m-01');
+        $to_date   =  date('Y-m-d');
+
+        $sales_invoices = DB::table('sales_invoices')
+        ->select('*')
+        ->where(function($query) use ($from_date, $to_date) 
+        {
+            if($from_date != null)
+                $query->where('sales_invoices.invoice_date','>=',$from_date);
+
+            if($to_date != null)
+                $query->where('sales_invoices.invoice_date','<=',$to_date);
+        })
+        ->get();
+
+        foreach ($sales_invoices as $key => $sales_invoice) 
+        {
+            $sales_invoice->id                   = $sales_invoice->id;
+            $sales_invoice->invoice_id           = $sales_invoice->invoice_id;
+            $sales_invoice->invoice_date         = $sales_invoice->invoice_date;
+            $sales_invoice->invoice_amount       = $sales_invoice->invoice_amount;
+            $sales_invoice->discount             = $sales_invoice->discount;
+            $sales_invoice->total_invoice_amount = $sales_invoice->invoice_amount - (($sales_invoice->invoice_amount * $sales_invoice->discount) / 100);
+        }
+
+        if(!$sales_invoices->isEmpty())
+        {
+            $data['sales_invoices'] = $sales_invoices;
+            return view("report.salesInvoiceReport")->with('data',$data);
+        }
+        else
+        {
+            return view("report.salesInvoiceReport");
+        }
     }
 
     /**
@@ -36,9 +71,9 @@ class salesInvoiceReport extends Controller
      */
     public function store(Request $request)
     {
-        $data                   = array();
-        $from_date   =$request->from_date;
-        $to_date     =$request->to_date;
+        $data      = array();
+        $from_date = $request->from_date;
+        $to_date   = $request->to_date;
 
         $sales_invoices = DB::table('sales_invoices')
         ->select('*')

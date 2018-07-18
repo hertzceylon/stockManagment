@@ -41,7 +41,6 @@
                   </div>
                 </div>
 
-
                 <div class="form-group">
                   <div class="col-sm-6">
                     <label class="text-right">Sales Return Date</label>
@@ -346,7 +345,7 @@ function reset()
   $("#item_id").selectpicker("refresh");
   $("#return_type_id").val('');
   $("#return_type_id").selectpicker("refresh");
-
+  $('#item_remark').val('');
   $('#item_price').val('');
   $('#return_qty').val('');
   $('#return_amount_td').val('');
@@ -433,7 +432,7 @@ function saveSalesReturn(update_id)
 function resetNewPage()
 {
   update_id = null;
-
+  $('table_error').val('');
   $('sales_return_date').val('');
   $("#sales_invoice_id").val('');
   $("#sales_invoice_id").selectpicker("refresh");

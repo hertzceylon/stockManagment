@@ -13,7 +13,39 @@ class salesReturnReport extends Controller
      */
     public function index()
     {
-        return view("report.salesReturnReport");
+        $data      = array();
+        $from_date = date('Y-m-01');
+        $to_date   = date('Y-m-d');
+
+        $sales_returns = DB::table('sales_returns')
+        ->select('*')
+        ->where(function($query) use ($from_date, $to_date) 
+        {
+            if($from_date != null)
+                $query->where('sales_returns.return_date','>=',$from_date);
+
+            if($to_date != null)
+                $query->where('sales_returns.return_date','<=',$to_date);
+        })
+        ->get();
+
+        foreach ($sales_returns as $key => $sales_return) 
+        {
+            $sales_return->id            = $sales_return->id;
+            $sales_return->return_id     = $sales_return->sales_return_id;
+            $sales_return->return_date   = $sales_return->return_date;
+            $sales_return->return_amount = $sales_return->return_amount;
+        }
+
+        if(!$sales_returns->isEmpty())
+        {
+            $data['sales_returns'] = $sales_returns;
+            return view("report.salesReturnReport")->with('data',$data);
+        }
+        else
+        {
+            return view("report.salesReturnReport");
+        }
     }
 
     /**
@@ -58,15 +90,15 @@ class salesReturnReport extends Controller
             $sales_return->return_amount = $sales_return->return_amount;
         }
 
-          if(!$sales_returns->isEmpty())
-          {
-            $data['sales_returns'] = $sales_returns;
-            return view("report.salesReturnReport")->with('data',$data);
-          }
-          else
-          {
-            return view("report.salesReturnReport");
-          }
+      if(!$sales_returns->isEmpty())
+      {
+        $data['sales_returns'] = $sales_returns;
+        return view("report.salesReturnReport")->with('data',$data);
+      }
+      else
+      {
+        return view("report.salesReturnReport");
+      }
     }
 
     /**

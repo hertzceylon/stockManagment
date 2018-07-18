@@ -61,7 +61,7 @@
                     @if(isset($data['grn']))
                       <input class="form-control" type="text" id="purchase_order_name"  name ="purchase_order_name" width="270" placeholder="Enter GRN Date" value="{{$data['grn']->order_id}}" readonly></input>
 
-                      <input  class="form-control" type="hidden" id="purchase_order_id"  name ="purchase_order_id" width="270" placeholder="Enter GRN Date" value="{{$data['grn']->purchase_order_id}}" readonly></input>
+                      <input  class="form-control" id="purchase_order_id"  name ="purchase_order_id" width="270" placeholder="Enter GRN Date" value="{{$data['grn']->purchase_order_id}}" style="display: none;"></input>
                     @else
                       <select class="selectpicker" data-live-search="true" name="purchase_order_id" id="purchase_order_id" width="270">
                         <option value="">Select Purchase Order</option>
@@ -278,7 +278,7 @@ function fetchPurchaseOrderEntries(purchase_order_id)
    data: data,
    success: function(order_entries)
    { 
-      var grnContent     = '';
+      var grnContent = '';
       $.each(order_entries, function (index, value) 
       {
         grnContent += '<tr id='+value.item_id+'><td hidden class="text-center item_id_class" style="border: 1px solid #dddddd;">'+value.item_id+'</td><td class="text-center item_name_class" style="border: 1px solid #dddddd;">'+value.item_name+'</td><td hidden class="text-center order_type_id_class" style="border: 1px solid #dddddd;">'+value.order_type+'</td><td class="text-center order_type_class" style="border: 1px solid #dddddd;">'+(value.order_type =="C" ? 'Case' : "Unit")+'</td><td class="text-center order_qty_class" style="border: 1px solid #dddddd;">'+value.order_qty+'</td><td class="text-center" style="border: 1px solid #dddddd;"><input type="text" class="form-control received_stock_qty_good_class" onkeypress="return numberOnly(event)"></td><td class="text-center" style="border: 1px solid #dddddd;"><input type="text" class="form-control received_stock_qty_bad" onkeypress="return numberOnly(event)"></td><td class="text-center" style="border: 1px solid #dddddd;"><input type="text" class="form-control item_price_class" onkeypress="return numberOnly(event)"></td><td class="text-center" style="border: 1px solid #dddddd;"><input type="text" class="datepicker form-control manif_date"></td><td class="text-center" style="border: 1px solid #dddddd;"><input type="text" class="datepicker form-control ex_date"></td><td class="text-center" style="border: 1px solid #dddddd;"><input type="text" class="form-control discount_class" onkeypress="return numberOnly(event)"></td><td class="text-center" style="border: 1px solid #dddddd;"><input type="text" class="form-control total_amount" onkeypress="return numberOnly(event)" readonly></td><td class="text-center remove_btn_class" style="border: 1px solid #dddddd;"><a onclick="removeGrnItem('+value.item_id+')" class="btn btn-danger btn-xs" type="button">Remove</a></td></tr>'
@@ -296,10 +296,7 @@ function fetchPurchaseOrderEntries(purchase_order_id)
         calendarWeeks:true,
         autoclose:false
       });
-
-
       createGrnObject();
-
     },
     error: function(jqXHR, textStatus, errorThrown) { // What to do if we fail
       console.log('comes error');
@@ -353,7 +350,6 @@ function calculation()
   $('#grn_entry_table > tbody  > tr').each(function(i, el)
   {
     var td          = $(this).find('td');
-    
     good_stock      = parseFloat(($(this).find('.received_stock_qty_good_class').val() =="" ? 0 : $(this).find('.received_stock_qty_good_class').val()));
     
     bad_stock       = parseFloat(($(this).find('.received_stock_qty_bad').val() == "" ? 0 : $(this).find('.received_stock_qty_bad').val()));
@@ -368,13 +364,11 @@ function calculation()
     grand_total     += grn_grand_total;
 
     $(this).find('.total_amount').val(grn_grand_total);
-
  });
 
   $('#grn_amount').val(grand_total);
 
   $('#grn_form').bootstrapValidator('revalidateField', 'grn_amount');
-  
 }
 
 function formValidate()
@@ -394,7 +388,6 @@ function saveGrn(update_id)
   if(update_id != null)
   {
     createGrnObject();
-
     purchase_order_id = $('#purchase_order_id').val();
   }
   else
@@ -418,31 +411,17 @@ function saveGrn(update_id)
     type: "post",
     data: data,
     dataType: 'JSON',
-    success: function (data) {
-
+    success: function (data) 
+    {
+      $('.alert-success').empty();
       if(data.status != undefined)
       {
-          $('.alert-success').show();
-          $('.alert-success').append('<p>'+data.status+'</p>');
-          resetNewPage();
+        $('.alert-success').show();
+        $('.alert-success').append('<p>'+data.status+'</p>');
+        update_id = data.id;
       }
     }
   });
 }
-
-function resetNewPage()
-{
-  update_id = null;
-  $('grn_date').val('');
-  $("#purchase_order_id").val('');
-  $("#purchase_order_id").selectpicker("refresh");
-  $('#grn_id').val('');
-  $('#remarks').val('');
-  $('#grn_amount').val('');
-  grn_item = [];
-  $('#grn_entry_table > tbody').empty();
-
-}
-
 </script>
 @endsection

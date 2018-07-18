@@ -14,8 +14,9 @@
             </div>
             <div class="col-sm-4" align="right">
               @if(isset($data['purchaseOrder']))
-                <a href="/print_purchase_order/{{$data['purchaseOrder']->id}}" target="_blank" class="btn btn-default"><i class="fa fa-print" aria-hidden="true"></i> Print</a>
+                <a href="/print_purchase_order/{{$data['purchaseOrder']->id}}" target="_blank" class="btn btn-default"><i class="fa fa-print" aria-hidden="true" onload="window.print();"></i> Print</a>
               @endif
+              <a class="btn btn-default" style="display: none;" id="print_btn"><i class="fa fa-print" aria-hidden="true"></i> Print </a>
               <a href="/purchase_order" class="btn btn-info"><i class="fa fa-eye" aria-hidden="true"></i> Lookup</a>
             </div>
           </div>
@@ -48,13 +49,11 @@
                     <label class="text-right">Order Date</label>
                   </div>
                   <div class="col-sm-6">
-
                     @if(isset($data['purchaseOrder']))
                       <input class="datepicker form-control" type="text" id="order_date"  name ="order_date" width="270" value="{{$data['purchaseOrder']->order_date}}" placeholder="Enter Order Date"></input>
                     @else
                       <input class="datepicker form-control" type="text" id="order_date"  name ="order_date" width="270" placeholder="Enter Order Date" value="<?php echo date('Y-m-d'); ?>"></input>
                     @endif
-                    
                   </div>
                 </div>
 
@@ -362,16 +361,22 @@ function savePurchaseOrder(update_id)
       {
           $('.alert-success').show();
           $('.alert-success').append('<p>'+data.status+'</p>');
-          resetNewPage();
+          print_id  = data.id;
+          // resetNewPage();
+          $('#print_btn').show();
       }
     }
   });
 }
 
+$('#print_btn').on('click',function ()
+{
+  print(print_id);
+});
+
 function resetNewPage()
 {
   update_id = null;
-
   $('#order_date').val('');
   $("#supplier_id").val('');
   $("#supplier_id").selectpicker("refresh");
@@ -379,7 +384,11 @@ function resetNewPage()
   $('#remarks').val('');
   order_item = [];
   $('#order_item_table > tbody  > tr:not(#order_item_table_opction_select)').empty();
+}
 
+function print(print_id)
+{
+  window.open("/print_purchase_order/"+print_id).print();
 }
 
 </script>

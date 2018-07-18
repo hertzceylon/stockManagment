@@ -98,14 +98,12 @@ class purchaseOrderController extends Controller
      */
     public function store(Request $request)
     {
-        $this->validate(request(),[
-            
-        ]);
-
         $validator = \Validator::make($request->all(), [
             'order_date'  => 'required',
             'supplier_id' => 'required',
         ]);
+
+        $print_id = 0;
 
         if ($validator->fails())
         {
@@ -123,6 +121,7 @@ class purchaseOrderController extends Controller
                 $purchaseOrder->updated_at  = null;
                 $purchaseOrder->save();
                 $insertedId                 = $purchaseOrder->id;
+                $print_id                   = $insertedId;
 
                 $order_item = $request->order_item;
 
@@ -153,6 +152,7 @@ class purchaseOrderController extends Controller
 
                 prchaseOrderEntry::where('purchase_order_id',$update_id)->delete();
                 $order_item = $request->order_item;
+                $print_id   = $update_id;
 
                 if(isset($order_item))
                 {
@@ -168,7 +168,7 @@ class purchaseOrderController extends Controller
                 }
             }
 
-            $response = array('status' =>'Record is successfully added');
+            $response = array('status' =>'Record is successfully added','id'=>$print_id);
             return response()->json($response);
         }
     }

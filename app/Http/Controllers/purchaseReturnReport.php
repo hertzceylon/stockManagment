@@ -17,7 +17,39 @@ class purchaseReturnReport extends Controller
         $data = array();
         $data['suppliers'] = supplier::OrderBy('created_at','asc')->get();
 
-        return view("report.purchaseReturnReport")->with('data',$data);
+        $from_date         =  date('Y-m-01');
+        $to_date           =  date('Y-m-d');
+
+        $purchaseReturns = DB::table('purchase_returns')
+        ->select(
+            'purchase_returns.id as id',
+            'purchase_returns.return_date as return_date',
+            'purchase_returns.return_id as return_id',
+            'purchase_returns.return_amount as return_amount',
+            'purchase_returns.created_at as created_at',
+            'purchase_returns.updated_at as updated_at',
+            'suppliers.supplier_name as supplier_name'
+        )
+        ->join('suppliers','suppliers.id','=','purchase_returns.supplier_id')
+         ->where(function($query) use ($from_date, $to_date) 
+            {
+                if($from_date != null)
+                    $query->where('purchase_returns.return_date','>=',$from_date);
+
+                if($to_date != null)
+                    $query->where('purchase_returns.return_date','<=',$to_date);
+            })
+        ->get();
+
+        if(!$purchaseReturns->isEmpty())
+        {
+            $data['purchaseReturns'] = $purchaseReturns;
+            return view("report.purchaseReturnReport")->with('data',$data);
+        }
+        else
+        {
+            return view("report.purchaseReturnReport");
+        }
     }
 
     /**
@@ -42,7 +74,7 @@ class purchaseReturnReport extends Controller
         $from_date   =$request->from_date;
         $to_date     =$request->to_date;
 
-         $purchaseReturns = DB::table('purchase_returns')
+        $purchaseReturns = DB::table('purchase_returns')
         ->select(
             'purchase_returns.id as id',
             'purchase_returns.return_date as return_date',

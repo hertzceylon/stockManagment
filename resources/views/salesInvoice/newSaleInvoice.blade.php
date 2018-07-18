@@ -22,7 +22,6 @@
             </div>
           </div>
         </div>
-
         <div class="panel-body">
           <div class="alert alert-success" role="alert" style="display:none"></div>
           <form  id='sales_invoice_form' method="post" class="form-horizontal" onsubmit="return false;">
@@ -523,8 +522,8 @@ function saveSalesInvoice(update_id)
         $('.alert-success').append('<p>'+data.status+'</p>');
 
         update_id = data.id;
-        print_id = data.id;
-        resetNewPage();
+        print_id  = data.id;
+        // resetNewPage();
         $('#print_btn').show();
       }
     }

@@ -133,7 +133,6 @@ $(document).ready(function()
 
     $('.js-example-basic-single').select2();
 
-
     $(function()
     {
         $('[data-toggle="tooltip"]').tooltip();

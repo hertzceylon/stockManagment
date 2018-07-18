@@ -38,7 +38,7 @@ class grnController extends Controller
 
         return view("grn.grns")->with('grns',$grns);
     }
-
+    
     /**
      * Show the form for creating a new resource.
      *
@@ -183,7 +183,7 @@ class grnController extends Controller
 
             $this->stock_control($grn_item,$grn_id_for_stock);
 
-            $response = array('status' =>'Record is successfully added');
+            $response = array('status' =>'Record is successfully added','id'=>$grn_id_for_stock);
             return response()->json($response);
         }
     }

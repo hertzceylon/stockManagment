@@ -17,7 +17,50 @@ class purchaseOrderReport extends Controller
         $data = array();
         $data['suppliers'] = supplier::OrderBy('created_at','asc')->get();
 
-        return view("report.purchaseOrderReport")->with('data',$data);
+        $from_date         =  date('Y-m-01');
+        $to_date           =  date('Y-m-d');
+
+        $purchaseOrders = DB::table('purchase_orders')
+        ->select(
+            'purchase_orders.id as id',
+            'purchase_orders.order_date as order_date',
+            'purchase_orders.order_id as order_id',
+            'purchase_orders.created_at as created_at',
+            'purchase_orders.updated_at as updated_at',
+            'suppliers.supplier_name as supplier_name'
+        )
+        ->join('suppliers','suppliers.id','=','purchase_orders.supplier_id')
+        ->where(function($query) use ($from_date, $to_date) 
+        {
+            if($from_date != null)
+                $query->where('purchase_orders.order_date','>=',$from_date);
+
+            if($to_date != null)
+                $query->where('purchase_orders.order_date','<=',$to_date);
+        })
+        ->get();
+
+        foreach ($purchaseOrders as $key => $purchaseOrder) 
+        {
+           $purchaseOrder->id            = $purchaseOrder->id;
+           $purchaseOrder->order_id      = $purchaseOrder->order_id;
+           $purchaseOrder->order_date    = $purchaseOrder->order_date;
+           $purchaseOrder->supplier_name = $purchaseOrder->supplier_name;
+           $purchaseOrder->grn_code      = 0;
+           $purchaseOrder->grn_date      = 0;
+           $purchaseOrder->grn_amount    = 0;
+        }
+
+
+        if(!$purchaseOrders->isEmpty())
+        {
+            $data['purchaseOrders'] = $purchaseOrders;
+            return view("report.purchaseOrderReport")->with('data',$data);
+        }
+        else
+        {
+            return view("report.purchaseOrderReport");
+        }
     }
 
     /**
@@ -76,12 +119,18 @@ class purchaseOrderReport extends Controller
            $purchaseOrder->grn_amount    = 0;
         }
         
-        $data                   = array();
-        $data['purchaseOrders'] = $purchaseOrders;
-        $data['suppliers']      = supplier::OrderBy('created_at','asc')->get();
+        $data              = array();
+        $data['suppliers'] = supplier::OrderBy('created_at','asc')->get();
 
-        return view("report.purchaseOrderReport")->with('data',$data);
-
+        if(!$purchaseOrders->isEmpty())
+        {
+            $data['purchaseOrders'] = $purchaseOrders;
+            return view("report.purchaseOrderReport")->with('data',$data);
+        }
+        else
+        {
+            return view("report.purchaseOrderReport");
+        }
     }
 
     /**

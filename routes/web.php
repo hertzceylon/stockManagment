@@ -42,7 +42,6 @@ Route::resource('purchase_order','purchaseOrderController');
 Route::get('/fetch_supplier_items', 'purchaseOrderController@fetch_supplier_items');
 Route::get('print_purchase_order/{print_id}','purchaseOrderController@print_purchase_order');
 
-
 //grn
 Route::resource('grn','grnController');
 Route::get('/fetch_purchase_order_entries', 'grnController@fetch_purchase_order_entries');
@@ -54,7 +53,6 @@ Route::resource('stock','stockController');
 Route::resource('sales_invoice','saleInvoiceController');
 Route::get('print_sales_invoice/{print_id}','saleInvoiceController@print_sales_invoice');
 Route::get('/invoice_code', 'saleInvoiceController@invoice_code');
-
 
 //purchase return 
 Route::resource('purchase_return','purchaseReturnController');

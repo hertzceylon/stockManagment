@@ -21,7 +21,7 @@
 
                     <div class="form-group">
                       <div class="col-sm-3">
-                        <input class="datepicker form-control" type="text" name="from_date" id="from_date" placeholder="From Date" value="<?php echo date('Y-m-d');?>">
+                        <input class="datepicker form-control" type="text" name="from_date" id="from_date" placeholder="From Date" value="<?php echo date('Y-m-01');?>">
                       </div>
 
                       <div class="col-sm-3">
